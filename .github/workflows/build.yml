@@ -1,0 +1,60 @@
+name: Build Performance Curve App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller pandas matplotlib scipy openpyxl numpy tkinter
+    
+    - name: Build Windows app
+      run: |
+        pyinstaller --onefile --windowed --name "性能曲線繪製器" --add-data "PerformanceCurveConfigDialog.py;." PerformanceCurveApp.py
+    
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-curve-windows
+        path: dist/性能曲線繪製器.exe
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        pip3 install pyinstaller pandas matplotlib scipy openpyxl numpy tkinter
+    
+    - name: Build macOS app
+      run: |
+        pyinstaller --onefile --windowed --name "性能曲線繪製器" --add-data "PerformanceCurveConfigDialog.py:." PerformanceCurveApp.py
+        chmod -R 755 dist/性能曲線繪製器.app
+        xattr -cr dist/性能曲線繪製器.app
+    
+    - name: Upload macOS app
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-curve-macos
+        path: dist/性能曲線繪製器.app
