@@ -1,1 +1,1 @@
-# performance-curve-app-1
+# performance-curve-app
